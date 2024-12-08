@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Event</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+<body>
+    <h1>Edit Event</h1>
+    <form action="{{ url_for('edit_event', id=event['_id']) }}" method="POST">
+        <input type="text" name="name" placeholder="Event Name" value="{{ event['name'] }}" required><br>
+        <input type="date" name="date" value="{{ event['date'] }}" required><br>
+        <input type="text" name="location" placeholder="Event Location" value="{{ event['location'] }}" required><br>
+        <textarea name="description" placeholder="Event Description" required>{{ event['description'] }}</textarea><br>
+        <button type="submit">Update Event</button>
+    </form>
+    <a href="{{ url_for('view_events') }}">Back to Events</a>
+</body>
+</html>

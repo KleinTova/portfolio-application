@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo_db
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+    networks:
+      - backend
+  
+
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: event-planner:latest
+    container_name: event-planner
+    restart: always
+    environment:
+      MONGO_URI: 'mongodb://root:1234@mongo:27017/event_db?authSource=admin'
+      FLASK_APP: 'app/app.py'
+      FLASK_ENV: 'development'
+    ports:
+    - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - backend
+      - frontend
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - frontend
+
+
+volumes:
+  mongo_data:
+
+networks:
+  backend:
+  frontend:
