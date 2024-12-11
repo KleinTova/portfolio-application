@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "Fetching tags..."
           git fetch --tags
-          git tag -l
+          git describe --tags --abbrev=0 --match "v*"
           #git fetch --tags && git describe --tags --abbrev=0 --match "v*"
           # echo "Latest tag fetched: $latestTag"
 
