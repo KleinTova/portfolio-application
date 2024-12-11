@@ -31,16 +31,19 @@ jobs:
           echo "Fetching tags..."
           latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v*" 2>/dev/null | tr -d '[:space:]' || echo "v0.0.0")
           echo "Latest tag fetched: $latestTag"
-          
+
           if [[ "$latestTag" == "v0.0.0" ]]; then
+            echo "no tags, the tag will be 1.0.0"
             NEW_VERSION="v1.0.0"
           else
+            echo "there are some tags"
             currentNumber=$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\3/')
             echo "Extracted current number: $currentNumber"
             NEW_VERSION="v$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\1.\2./')$(($currentNumber + 1))"
           fi
-          
+
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "the version $NEW_VERSION"
 
       # 3. Build Docker image
       - name: Build Docker image
