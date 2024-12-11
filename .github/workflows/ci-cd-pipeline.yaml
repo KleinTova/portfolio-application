@@ -29,10 +29,10 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           echo "Fetching tags..."
-          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v[0-9]*" --always 2>/dev/null | tr -d '[:space:]' || echo "v0.0.0")
+          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v[0-9]*" --always)
           echo "Latest tag fetched: $latestTag"
 
-          if [[ "$latestTag" == "0.0.0" ]]; then
+          if [[ "$latestTag" == "" ]]; then
             echo "no tags, the tag will be 1.0.0"
             NEW_VERSION="v1.0.0"
           else
