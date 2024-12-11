@@ -41,7 +41,7 @@ jobs:
       # 4. Run E2E tests
       - name: Run E2E tests
         run: |
-          udo apt-get update
+          sudo apt-get update
           sudo apt-get install docker-compose-plugin
           docker compose version
           docker-compose down
