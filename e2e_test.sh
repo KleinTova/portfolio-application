@@ -10,6 +10,8 @@ BASE_URL="http://$HOST:5000"
 SUCCESS=0
 FAILED=0
 
+#comment
+
 performRequest() {
     local method="$1"
     local endpoint="$2"
