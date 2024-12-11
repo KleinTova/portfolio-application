@@ -54,7 +54,7 @@ jobs:
       # 3. Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t $IMAGE_NAME:${{ env.NEW_VERSION }} .
+          docker build -t $IMAGE_NAME:${{ env.NEW_VERSION?: $IMAGE_TAG }} 
 
       # 4. Run E2E tests
       - name: Run E2E tests
@@ -78,7 +78,7 @@ jobs:
           git config --global user.name "tova.klein"
           git tag -a ${NEW_VERSION} -m "Version ${NEW_VERSION}"
           git push origin ${NEW_VERSION}
-          
+
       #6. Push the new image to the ECR docker registry
       - name: Push Docker Image to ECR
         if: github.ref == 'refs/heads/main'
