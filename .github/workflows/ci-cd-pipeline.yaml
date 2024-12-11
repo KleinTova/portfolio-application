@@ -30,8 +30,8 @@ jobs:
         run: |
           echo "Fetching tags..."
           git fetch --tags
-          git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1
-          #git describe --tags --abbrev=0 --match "v[0-9]*" --always
+          git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1 | sed 's/\^{}//'
+          # git describe --tags --abbrev=0 --match "v[0-9]*" --always
           # latestTag=$(git describe --tags --abbrev=0 --match "v[0-9]*" --always)
           # echo "Latest tag fetched: $latestTag"
 
