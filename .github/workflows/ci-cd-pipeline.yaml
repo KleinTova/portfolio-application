@@ -28,13 +28,18 @@ jobs:
       - name: Calculate new version
         if: github.ref == 'refs/heads/main'
         run: |
-          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "v1.0.0")
-          if [ "$latestTag" = "v1.0.0" ]; then
+          echo "Fetching tags..."
+          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag fetched: $latestTag"
+
+          if [[ "$latestTag" == "v0.0.0" ]]; then
             NEW_VERSION="v1.0.0"
           else
             currentNumber=$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\3/')
+            echo "Extracted current number: $currentNumber"
             NEW_VERSION="v$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\1.\2./')$(($currentNumber + 1))"
           fi
+
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       # 3. Build Docker image
