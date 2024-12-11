@@ -63,6 +63,8 @@ jobs:
 
   notify:
     runs-on: ubuntu-latest
+    needs: build
+    if: always()
     steps:
       - name: Get author and committer emails
         id: emails
