@@ -92,6 +92,7 @@ jobs:
       - name: Get author and committer emails
         id: emails
         run: |
+          cd ${{ github.workspace }}
           EMAILS=$(git log -1 --format='%ae,%ce' ${{ github.event.after }})
           echo "AUTH_COMMIT_EMAILS=${EMAILS}" >> $GITHUB_ENV
 
