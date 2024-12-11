@@ -1,0 +1,92 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+
+env:
+  AWS_REGION: 'us-east-1'
+  ECR_REPO_NAME: 'tova-portfolio/event-planner'
+  IMAGE_TAG: 'latest'
+  IMAGE_NAME: 'event-planner'
+  AWS_ACCOUNT_ID: '006262944085' 
+  ECR_URI: '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com' 
+  EC2_IP: 'localhost'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clone the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Calculate new version if branch is main
+      - name: Calculate new version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "v1.0.0")
+          currentNumber=$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\3/')
+          NEW_VERSION="v$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\1.\2./')$(($currentNumber + 1))"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      # 3. Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t $IMAGE_NAME:${{ env.NEW_VERSION }} .
+
+      # 4. Run E2E tests
+      - name: Run E2E tests
+        run: |
+          docker-compose down
+          VERSION=${{ env.NEW_VERSION }} docker-compose up -d
+          sleep 30
+          chmod +x e2e_test.sh
+          ./e2e_test.sh ${EC2_IP}
+          docker-compose down
+
+      # 5. Publish version and push tag (only for main branch)
+      - name: Publish version
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.email "tova.klein@develeap.com"
+          git config --global user.name "tova.klein"
+          git tag -a ${NEW_VERSION} -m "Version ${NEW_VERSION}"
+          git push origin ${NEW_VERSION}
+
+  notify:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get author and committer emails
+        id: emails
+        run: |
+          EMAILS=$(git log -1 --format='%ae,%ce' ${{ github.event.after }})
+          echo "AUTH_COMMIT_EMAILS=${EMAILS}" >> $GITHUB_ENV
+
+      - name: Send failure email if pipeline fails
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          from: 'tova.klein@develeap.com'
+          to: ${{ env.AUTH_COMMIT_EMAILS }}
+          subject: 'Pipeline Failed'
+          body: |
+            Your GitHub Action pipeline has failed.
+            Commit ID: ${{ github.event.after }}
+            Check the details here: ${{ github.run_url }}
+
+      - name: Send success email if pipeline succeeds
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          from: 'no-reply@yourdomain.com'
+          to: ${{ env.AUTH_COMMIT_EMAILS }}
+          subject: 'Pipeline Succeeded'
+          body: |
+            Your GitHub Action pipeline has succeeded.
+            Commit ID: ${{ github.event.after }}
+            Check the details here: ${{ github.run_url }}

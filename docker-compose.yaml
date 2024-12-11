@@ -16,10 +16,7 @@ services:
 
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: event-planner:latest
+    image: event-planner:${VERSION:-latest}
     container_name: event-planner
     restart: always
     environment:
