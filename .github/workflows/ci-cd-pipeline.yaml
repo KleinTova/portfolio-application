@@ -19,6 +19,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    output:
+      version: ${{ steps.calculate_new_version.outputs.NEW_VERSION }}
 
     steps:
       # 1. Clone the repository
@@ -27,6 +29,7 @@ jobs:
 
       # 2. Calculate new version if branch is main
       - name: Calculate new version
+        id: calculate_new_version
         if: github.ref == 'refs/heads/main'
         run: |
           echo "Fetching tags..."
@@ -92,7 +95,7 @@ jobs:
     steps:
       - name: Print success message if pipeline succeeds
         if: success()
-        run: echo "Pipeline succeeded. The new version is ${{ env.NEW_VERSION }}"
+        run: echo "Pipeline succeeded. The new version is ${{ needs.build.outputs.NEW_VERSION }}"
 
       - name: Print failure message if pipeline fails
         if: failure()
