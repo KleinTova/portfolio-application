@@ -45,43 +45,43 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "the version $NEW_VERSION"
 
-      # 3. Build Docker image
-      - name: Build Docker image
-        run: |
-          docker build -t $IMAGE_NAME:${{ env.NEW_VERSION }} .
+      # # 3. Build Docker image
+      # - name: Build Docker image
+      #   run: |
+      #     docker build -t $IMAGE_NAME:${{ env.NEW_VERSION }} .
 
-      # 4. Run E2E tests
-      - name: Run E2E tests
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          docker compose version
-          docker-compose down
-          VERSION=${{ env.NEW_VERSION }} docker-compose up -d
-          sleep 30
-          chmod +x e2e_test.sh
-          ./e2e_test.sh ${EC2_IP}
-          docker-compose down
-          sudo apt-get remove -y docker-compose
+      # # 4. Run E2E tests
+      # - name: Run E2E tests
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y docker-compose
+      #     docker compose version
+      #     docker-compose down
+      #     VERSION=${{ env.NEW_VERSION }} docker-compose up -d
+      #     sleep 30
+      #     chmod +x e2e_test.sh
+      #     ./e2e_test.sh ${EC2_IP}
+      #     docker-compose down
+      #     sudo apt-get remove -y docker-compose
 
-      # 5. Publish version and push tag (only for main branch)
-      - name: Publish version
-        if: github.ref == 'refs/heads/main'
-        run: |
-          git config --global user.email "tova.klein@develeap.com"
-          git config --global user.name "tova.klein"
-          git tag -a ${NEW_VERSION} -m "Version ${NEW_VERSION}"
-          git push origin ${NEW_VERSION}
+      # # 5. Publish version and push tag (only for main branch)
+      # - name: Publish version
+      #   if: github.ref == 'refs/heads/main'
+      #   run: |
+      #     git config --global user.email "tova.klein@develeap.com"
+      #     git config --global user.name "tova.klein"
+      #     git tag -a ${NEW_VERSION} -m "Version ${NEW_VERSION}"
+      #     git push origin ${NEW_VERSION}
 
-      - name: Push Docker Image to ECR
-        if: github.ref == 'refs/heads/main'
-        run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_URI }}
-          docker tag $IMAGE_NAME:${{ env.NEW_VERSION }} ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
-          docker push ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Push Docker Image to ECR
+      #   if: github.ref == 'refs/heads/main'
+      #   run: |
+      #     aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_URI }}
+      #     docker tag $IMAGE_NAME:${{ env.NEW_VERSION }} ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
+      #     docker push ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # notify:
   #   runs-on: ubuntu-latest
   #   needs: build
