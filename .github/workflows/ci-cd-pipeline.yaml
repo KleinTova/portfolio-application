@@ -29,7 +29,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           echo "Fetching tags..."
-          latestTag=$(git fetch --tags && git describe --tags --abbrev=0 --match "v[0-9]*" --always)
+          git fetch --tags
+          latestTag=$(git describe --tags --abbrev=0 --match "v[0-9]*" --always)
           echo "Latest tag fetched: $latestTag"
 
           if [[ "$latestTag" == "" ]]; then
