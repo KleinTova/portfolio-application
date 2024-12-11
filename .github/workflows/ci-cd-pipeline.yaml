@@ -95,7 +95,7 @@ jobs:
     steps:
       - name: Print success message if pipeline succeeds
         if: success()
-        run: echo "Pipeline succeeded. The new version is ${{ needs.build.outputs.NEW_VERSION }}"
+        run: echo "Pipeline succeeded. The new version is ${{ needs.build.outputs.version }}"
 
       - name: Print failure message if pipeline fails
         if: failure()
