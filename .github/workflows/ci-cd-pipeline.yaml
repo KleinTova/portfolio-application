@@ -41,12 +41,16 @@ jobs:
       # 4. Run E2E tests
       - name: Run E2E tests
         run: |
+          udo apt-get update
+          sudo apt-get install docker-compose-plugin
+          docker compose version
           docker-compose down
           VERSION=${{ env.NEW_VERSION }} docker-compose up -d
           sleep 30
           chmod +x e2e_test.sh
           ./e2e_test.sh ${EC2_IP}
           docker-compose down
+          sudo apt-get remove docker-compose-plugin
 
       # 5. Publish version and push tag (only for main branch)
       - name: Publish version
