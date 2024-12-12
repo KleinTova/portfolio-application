@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "Fetching tags..."
           git fetch --tags
-          #latestTag=$(git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1 | sed 's/\^{}//')
+          latestTag=$(git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1 | sed 's/\^{}//')
           echo "Latest tag fetched: $latestTag"
 
           if [[ "$latestTag" == "" ]]; then
@@ -69,7 +69,7 @@ jobs:
           sudo apt-get install -y docker-compose
           docker compose version
           docker-compose down
-          VERSION=${{ env.NEW_VERSION }} docker-compose up -d
+          #VERSION=${{ env.NEW_VERSION }} docker-compose up -d
           sleep 30
           chmod +x e2e_test.sh
           ./e2e_test.sh ${EC2_IP}
