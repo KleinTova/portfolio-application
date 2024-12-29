@@ -60,10 +60,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t $IMAGE_NAME:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) .
-          echo "**************pwd**********"
-          pwd
-          ls
-          #docker build -t nginx:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) Dockerfile.nginx
+
+          docker build -t nginx:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) ./Dockerfile.nginx
 
 
       # 4. Run E2E tests
