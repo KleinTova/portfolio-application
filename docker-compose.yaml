@@ -32,9 +32,7 @@ services:
       - frontend
 
   nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
+    image: nginx:${VERSION:-latest}
     container_name: nginx
     restart: always
     ports:

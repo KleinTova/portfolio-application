@@ -13,7 +13,8 @@ on:
 
 env:
   AWS_REGION: 'us-east-1'
-  ECR_REPO_NAME: 'tova-portfolio/event-planner'
+  ECR_REPO_EVENT_PLANNER: 'tova-portfolio/event-planner'
+  ECR_REPO_NGINX: 'tova-portfolio/nginx'
   IMAGE_TAG: 'latest'
   IMAGE_NAME: 'event-planner'
   AWS_ACCOUNT_ID: '006262944085' 
@@ -60,7 +61,8 @@ jobs:
         run: |
           docker build -t $IMAGE_NAME:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) .
 
-          #docker build -t $IMAGE_NAME:${{ env.NEW_VERSION }} ? : $IMAGE_TAG 
+          docker build -t nginx:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) Dockerfile.nginx
+
 
       # 4. Run E2E tests
       - name: Run E2E tests
@@ -97,8 +99,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_URI }}
-          docker tag $IMAGE_NAME:${{ env.NEW_VERSION }} ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
-          docker push ${{ env.ECR_URI }}/${{ env.ECR_REPO_NAME }}:${{ env.NEW_VERSION }}
+          docker tag $IMAGE_NAME:${{ env.NEW_VERSION }} ${{ env.ECR_URI }}/${{ env.ECR_REPO_EVENT_PLANNER }}:${{ env.NEW_VERSION }}
+          docker push ${{ env.ECR_URI }}/${{ env.ECR_REPO_EVENT_PLANNER }}:${{ env.NEW_VERSION }}
+          docker tag nginx:${{ env.NEW_VERSION }} ${{ env.ECR_URI }}/${{ env.ECR_REPO_NGINX }}:${{ env.NEW_VERSION }}
+          docker push ${{ env.ECR_URI }}/${{ env.ECR_REPO_NGINX }}:${{ env.NEW_VERSION }}
+
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
