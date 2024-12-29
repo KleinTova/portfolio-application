@@ -39,22 +39,22 @@ jobs:
         run: |
           echo "Fetching tags..."
           git fetch --tags
-          latestTag=$(git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1 | sed 's/\^{}//')
+          latestTag=$(git tag --sort=-v:refname | head -1)
           echo "Latest tag fetched: $latestTag"
-
+      
           if [[ "$latestTag" == "" ]]; then
-            echo "no tags, the tag will be 1.0.0"
+            echo "No tags found, the tag will be v1.0.0"
             NEW_VERSION="v1.0.0"
           else
-            echo "there are some tags"
+            echo "Existing tags found"
             currentNumber=$(echo $latestTag | grep -oP '\d+\.\d+\.(\d+)' | grep -oP '\d+$')
             echo "Extracted current number: $currentNumber"
             NEW_VERSION="v$(echo $latestTag | sed -E 's/v([0-9]+)\.([0-9]+)\.([0-9]+)/\1.\2./')$((currentNumber + 1))"
           fi
-
+      
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "the version $NEW_VERSION"
+          echo "The new version: $NEW_VERSION"
 
       # 3. Build Docker image
       - name: Build Docker image
