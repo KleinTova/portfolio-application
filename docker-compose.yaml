@@ -16,8 +16,8 @@ services:
 
 
   web:
-    #image: event-planner:${VERSION:-latest}
-    image: 006262944085.dkr.ecr.us-east-1.amazonaws.com/tova-portfolio/event-planner:v1.0.12
+    image: event-planner:${VERSION:-latest}
+    #image: 006262944085.dkr.ecr.us-east-1.amazonaws.com/tova-portfolio/event-planner:v1.0.12
     container_name: event-planner
     restart: always
     environment:
@@ -33,12 +33,14 @@ services:
       - frontend
 
   nginx:
-    #image: nginx:${VERSION:-latest}
     image: nginx:latest
     container_name: nginx
     restart: always
     ports:
       - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./app/static:/usr/share/nginx/html/static
     depends_on:
       - web
     networks:
