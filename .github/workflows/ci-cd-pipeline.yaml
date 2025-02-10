@@ -31,14 +31,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 5. Check for Merge Conflicts
+      # 2. Check for Merge Conflicts
       - name: Check for Merge Conflicts
         if: github.event_name == 'pull_request'
         run: |
           git fetch origin main
           git merge --no-commit --no-ff origin/main || echo "Merge conflicts detected!"
 
-      # 2. Calculate new version if branch is main
+      # 3. Calculate new version if branch is main
       - name: Calculate new version
         id: calculate_new_version
         if: github.ref == 'refs/heads/main'
@@ -62,12 +62,12 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "The new version: $NEW_VERSION"
 
-      # 3. Build Docker image
+      # 4. Build Docker image
       - name: Build Docker image
         run: |
           docker build -t $IMAGE_NAME:$( [ "$GITHUB_REF" == "refs/heads/main" ] && echo $NEW_VERSION || echo $IMAGE_TAG ) .
 
-      # 4. Run E2E tests
+      # 5. Run E2E tests
       - name: Run E2E tests
         run: |
           sudo apt-get update
