@@ -74,16 +74,12 @@ jobs:
           sudo apt-get install -y docker-compose
           docker compose version
           docker-compose down
-          VERSION=${{ env.NEW_VERSION }} MONGO_URI=${{ secrets.MONGO_URI }} docker-compose up -d
+          VERSION=${{ env.NEW_VERSION }} MONGO_URI=${{ secrets.MONGO_URI }} MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} docker-compose up -d
           sleep 30
           chmod +x e2e_test.sh
           ./e2e_test.sh ${EC2_IP}
           docker-compose down
-          sudo apt-get remove -y docker-compose
-
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-      
+          sudo apt-get remove -y docker-compose      
 
       # 6. Publish version and push tag (only for main branch)
       - name: Publish version
