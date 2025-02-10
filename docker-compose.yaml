@@ -7,6 +7,9 @@ services:
     restart: always
     volumes:
       - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234
     networks:
       - backend
   
@@ -18,7 +21,7 @@ services:
     container_name: event-planner
     restart: always
     environment:
-      MONGO_URI: 'mongodb://root:1234@mongo:27017/event_db?authSource=admin'
+      MONGO_URI: ${MONGO_URI} #'mongodb://root:1234@mongo:27017/event_db?authSource=admin'
       FLASK_APP: 'app/app.py'
       FLASK_ENV: 'development'
     ports:
