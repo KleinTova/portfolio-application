@@ -9,6 +9,18 @@ on:
   pull_request:
     branches:
       - main
+  
+  workflow_dispatch:
+    inputs:
+      ENV:
+        description: "Select environment"
+        required: false
+        default: "development"
+        type: choice
+        options:
+          - development
+          - production
+
 
 
 env:
@@ -27,6 +39,12 @@ jobs:
       version: ${{ steps.calculate_new_version.outputs.NEW_VERSION }}
 
     steps:
+
+      # pre step - set environment
+      - name: Set environment variable
+        run: |
+          echo "ENV=${{ inputs.ENV }}" >> $GITHUB_ENV
+
       # 1. Clone the repository
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -37,14 +55,6 @@ jobs:
         run: |
           git fetch origin main
           git merge --no-commit --no-ff origin/main || echo "Merge conflicts detected!"
-
-      - name: Set environment variable based on branch
-        run: |
-          if [[ "${GITHUB_REF#refs/heads/}" == "release" ]]; then
-            echo "ENV=production" >> $GITHUB_ENV
-          else
-            echo "ENV=development" >> $GITHUB_ENV
-          fi
 
       # 3. Calculate new version if branch is main
       - name: Calculate new version
