@@ -38,6 +38,14 @@ jobs:
           git fetch origin main
           git merge --no-commit --no-ff origin/main || echo "Merge conflicts detected!"
 
+      - name: Set environment variable based on branch
+        run: |
+          if [[ "${GITHUB_REF#refs/heads/}" == "release" ]]; then
+            echo "ENV=production" >> $GITHUB_ENV
+          else
+            echo "ENV=development" >> $GITHUB_ENV
+          fi
+
       # 3. Calculate new version if branch is main
       - name: Calculate new version
         id: calculate_new_version
@@ -74,7 +82,7 @@ jobs:
           sudo apt-get install -y docker-compose
           docker compose version
           docker-compose down
-          VERSION=${{ env.NEW_VERSION }} MONGO_URI=${{ secrets.MONGO_URI }} MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} docker-compose up -d
+          VERSION=${{ env.NEW_VERSION }} MONGO_URI=${{ secrets.MONGO_URI }} MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }} MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} ENV=${{ env.ENV }} docker-compose up -d
           sleep 30
           chmod +x e2e_test.sh
           ./e2e_test.sh ${EC2_IP}

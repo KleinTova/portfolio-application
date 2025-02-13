@@ -12,4 +12,8 @@ EXPOSE 5000
 
 ENV FLASK_APP=app/app.py
 
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
+ARG ENV=development
+
+ENV ENV=$ENV
+
+CMD ["sh", "-c", "if [ \"$ENV\" = \"production\" ]; then gunicorn -w 4 -b 0.0.0.0:5000 app.app:app; else flask run --host=0.0.0.0; fi"]
