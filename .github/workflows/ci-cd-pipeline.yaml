@@ -130,7 +130,7 @@ jobs:
           git config --global user.email "tova.klein@develeap.com"
           git config --global user.name "tova.klein"
 
-          git config/dev/add event-planner-values-dev.yaml
+          git add config/dev/event-planner-values-dev.yaml
           git commit -m "Update image tag to ${NEW_VERSION}"
           git push origin main
         env:
