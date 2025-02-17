@@ -125,12 +125,12 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITOPS_REPO_TOKEN }}@github.com/KleinTova/portfolio-gitops-config.git
           cd portfolio-gitops-config
 
-          sed -i "s/tag: \".*\"/tag: \"${NEW_VERSION}\"/" event-planner-values-dev.yaml
+          sed -i "s/tag: \".*\"/tag: \"${NEW_VERSION}\"/" event-planner-umbrella-chart/charts/event-planner/values.yaml
 
           git config --global user.email "tova.klein@develeap.com"
           git config --global user.name "tova.klein"
 
-          git add event-planner-values-dev.yaml
+          git add event-planner-umbrella-chart/charts/event-planner/values.yaml
           git commit -m "Update image tag to ${NEW_VERSION}"
           git push origin main
         env:
