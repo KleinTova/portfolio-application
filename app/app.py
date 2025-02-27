@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 
 app.config['MONGO_URI'] = os.getenv("MONGO_URI")
 app.secret_key = 'e9c7e5c4b3a2f7d1e9a8c1b4f5d6e7f8'
+logger.info(app)
 mongo = PyMongo(app)
+
 
 # Prometheus metrics
 events_created = Counter('events_created_total', 'Total number of events created')
